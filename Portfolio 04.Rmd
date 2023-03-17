@@ -11,12 +11,12 @@ This portfolio will demonstrate how dMACS shrunk works with code.
 
 ### Create invariant items 
 
-```{r}
+```{r fake data}
 set.seed(55555)
 
 library(dmacs)
 
-eta <- seq(-1000,1000, by = .1) #Generate true scores
+eta <- seq(-1000,1000, by = 10) #Generate true scores
 load.R <- .6 #loading for the reference group
 load.F <- 1.2 #loading for focal group
 int.R <- 0 #intercept for reference group
@@ -124,19 +124,9 @@ updatePar <- function(rho0, v0, N, ybar) {
 ```
 
 
-### Fake Non-Invariant Items
+### Update Paramenter
 
-```{r }
-Eta <- seq(-1000,1000, by = 10) #Generate true scores
-load.R <- .6 #loading for the reference group
-load.F <- 1.2 #loading for focal group
-int.R <- 0 #intercept for reference group
-int.F <- 1 #intercept for focal group
-
-y.R <- load.R*Eta + int.R #model-implied scores for reference group
-y.F <- load.F*Eta + int.F #model-implied scores for focal group
-
-
+```{r Update Parameter}
 priorPH0  <- 0.5
 sigmaSlab <- 1
 
@@ -144,7 +134,7 @@ sigmaSlab <- 1
 # datExplBlock1 <- subset(datExpl, ValenceBlock == "1" & Block == "1")$DV
 # datExplBlock2 <- subset(datExpl, ValenceBlock == "1" & Block == "2")$DV
 
-ybarExpl <- get.dMACS(y.R, y.F)
+ybarExpl <- get.dMACS(y.R, y.F, eta)
 nExpl <- length(y.R)
 
 upMAExpl <- updatePar(priorPH0, sigmaSlab, nExpl, ybarExpl[1L])
@@ -158,7 +148,7 @@ tbExplicit
 
 Ta da! So we get the posterior mean dMACs estimate of .66 which is about the same as the original esimate calculated. Now all that's is left to do multiply this by the posterior probability of dMACS having a real effect which is 1 - Ph0(the probability that there is an effect of zero). 
 
-```{r dMACS}
+```{r dMACS_Shrunk}
 dMACS_Shrunk <- (1-tbExplicit[1])*tbExplicit[2]
 dMACS_Shrunk
 ```

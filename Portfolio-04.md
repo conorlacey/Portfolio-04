@@ -14,7 +14,7 @@ set.seed(55555)
 
 library(dmacs)
 
-eta <- seq(-1000,1000, by = .1) #Generate true scores
+eta <- seq(-1000,1000, by = 10) #Generate true scores
 load.R <- .6 #loading for the reference group
 load.F <- 1.2 #loading for focal group
 int.R <- 0 #intercept for reference group
@@ -124,19 +124,9 @@ updatePar <- function(rho0, v0, N, ybar) {
 }
 ```
 
-### Fake Non-Invariant Items
+### Update Paramenter
 
 ``` r
-Eta <- seq(-1000,1000, by = 10) #Generate true scores
-load.R <- .6 #loading for the reference group
-load.F <- 1.2 #loading for focal group
-int.R <- 0 #intercept for reference group
-int.F <- 1 #intercept for focal group
-
-y.R <- load.R*Eta + int.R #model-implied scores for reference group
-y.F <- load.F*Eta + int.F #model-implied scores for focal group
-
-
 priorPH0  <- 0.5
 sigmaSlab <- 1
 
@@ -144,7 +134,7 @@ sigmaSlab <- 1
 # datExplBlock1 <- subset(datExpl, ValenceBlock == "1" & Block == "1")$DV
 # datExplBlock2 <- subset(datExpl, ValenceBlock == "1" & Block == "2")$DV
 
-ybarExpl <- get.dMACS(y.R, y.F)
+ybarExpl <- get.dMACS(y.R, y.F, eta)
 nExpl <- length(y.R)
 
 upMAExpl <- updatePar(priorPH0, sigmaSlab, nExpl, ybarExpl[1L])
@@ -159,4 +149,18 @@ tbExplicit
     ##            ph0       mu1        sd1     Lower     Upper modelAveraged
     ## 1 9.986886e-19 0.6633703 0.07035975 0.5254677 0.8012728     0.6633703
 
-Ta da! So we get th
+Ta da! So we get the posterior mean dMACs estimate of .66 which is about
+the same as the original esimate calculated. Now all that’s is left to
+do multiply this by the posterior probability of dMACS having a real
+effect which is 1 - Ph0(the probability that there is an effect of
+zero).
+
+``` r
+dMACS_Shrunk <- (1-tbExplicit[1])*tbExplicit[2]
+dMACS_Shrunk
+```
+
+    ##         ph0
+    ## 1 0.6633703
+
+And there we have it! dMACS_Shrunk in action!
