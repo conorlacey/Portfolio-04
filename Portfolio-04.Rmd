@@ -56,7 +56,7 @@ get.dMACS <- function(outcome.R, outcome.F, eta = Eta) {
   load.R <- lm.R[2]
   int.R <- lm.R[1]
   load.F <- lm.F[2]
-  int.F <- lm.F[2]
+  int.F <- lm.F[1]
   integrand <- function(x){
     product<-(load.R*x + int.R) - (load.F*x + int.F)
     return((product^2)*dnorm(x,mean(eta), sd(eta)))
